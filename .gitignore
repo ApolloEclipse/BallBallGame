@@ -1,0 +1,11 @@
+# Ignore build files and MonoGame cache
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+*.csproj.user
+*.mgcb
+*.tmp
+*.log
