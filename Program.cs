@@ -4,7 +4,7 @@ namespace Ball_Ball
 {
     public static class Program
     {
-        [STAThread]
+        [STAThread] // Required for MonoGame window management
         static void Main()
         {
             using var game = new GameManager(); // Initialize the game
