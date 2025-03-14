@@ -2,35 +2,43 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-// Represents the player character
 public class Player
 {
-    private Texture2D _texture;
-    private Vector2 _position;
-    private float _speed = 300f; // Adjusted for smooth movement
+    private Texture2D _texture; // Player texture
+    private Vector2 _position; // Player position
+    private float _speed = 3f; // Player movement speed
+    private bool _movingUp = true; // Controls movement direction
 
-    public Player(Texture2D texture, Vector2 startPosition)
+    private int minBoundaryY; // Minimum Y boundary
+    private int maxBoundaryY; // Maximum Y boundary
+
+    private KeyboardState _previousState; // Tracks previous key state
+
+    public Player(Texture2D texture, Vector2 startPosition, int minY, int maxY)
     {
         _texture = texture;
         _position = startPosition;
+        minBoundaryY = minY;
+        maxBoundaryY = maxY;
     }
 
     public void Update(GameTime gameTime)
     {
-        KeyboardState keyboardState = Keyboard.GetState();
-        float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        KeyboardState currentState = Keyboard.GetState();
 
-        if (keyboardState.IsKeyDown(Keys.Up))
+        // Toggle direction only on the first key press (prevents multiple flips)
+        if (currentState.IsKeyDown(Keys.Space) && _previousState.IsKeyUp(Keys.Space))
         {
-            _position.Y -= _speed * deltaTime;
-        }
-        if (keyboardState.IsKeyDown(Keys.Down))
-        {
-            _position.Y += _speed * deltaTime;
+            _movingUp = !_movingUp;
         }
 
-        // Ensure player stays within screen bounds
-        _position.Y = MathHelper.Clamp(_position.Y, 0, 1080 - _texture.Height);
+        // Move player based on direction
+        _position.Y += _movingUp ? -_speed : _speed;
+
+        // Keep player within boundaries
+        _position.Y = MathHelper.Clamp(_position.Y, minBoundaryY, maxBoundaryY);
+
+        _previousState = currentState; // Store the current state for the next frame
     }
 
     public void Draw(SpriteBatch spriteBatch)
