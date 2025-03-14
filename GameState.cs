@@ -1,17 +1,25 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
+// Abstract base class for all game states
 public abstract class GameState
 {
-    protected GameStateManager _stateManager; // Reference to the state manager, This allows each state to change states when needed
+    protected GameStateManager _stateManager; // Manages game states
+    protected GraphicsDevice _graphicsDevice; // Handles rendering
+    protected ContentManager _content; // Loads content
 
-    // Constructor - receives the state manager as a parameter , This allows the state to change to another state if needed
-    public GameState(GameStateManager stateManager)
+    public GameState(GameStateManager stateManager, GraphicsDevice graphicsDevice, ContentManager content)
     {
         _stateManager = stateManager;
+        _graphicsDevice = graphicsDevice;
+        _content = content;
     }
 
-    public abstract void Enter();  // Called when this state becomes active
-    public abstract void Exit();   // Called when switching away from this state
-    public abstract void Update(GameTime gameTime); // Handles game logic
-    public abstract void Draw(GameTime gameTime);   // Handles rendering
+    public abstract void Enter(); // Called when state is entered
+    public virtual void Exit() { } // Called when state is exited
+
+    public abstract void Update(GameTime gameTime); // Ensures each game state implements logic updates
+
+    public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch); // Handles rendering
 }
