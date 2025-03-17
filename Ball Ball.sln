@@ -7,10 +7,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ball Ball", "Ball Ball.cspr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
+		Ball.cs = Ball.cs
+		Border.cs = Border.cs
+		BorderManager.cs = BorderManager.cs
+		Debuff.cs = Debuff.cs
 		GameManager.cs = GameManager.cs
 		GameState.cs = GameState.cs
 		GameStateManager.cs = GameStateManager.cs
+		IMovable.cs = IMovable.cs
+		IScrolling.cs = IScrolling.cs
+		LevelManager.cs = LevelManager.cs
 		MainMenuState.cs = MainMenuState.cs
+		ObjectSpawner.cs = ObjectSpawner.cs
 		Player.cs = Player.cs
 		PlayingState.cs = PlayingState.cs
 	EndProjectSection
