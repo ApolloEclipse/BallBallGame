@@ -1,9 +1,10 @@
 ﻿// ICollidable.cs
-// Interface for objects that can be collided with.
+// Defines an interface for objects that support collision detection.
 
 using Microsoft.Xna.Framework;
 
 public interface ICollidable
 {
-    Rectangle GetBounds();  // Returns the object's collision box.
+    // Returns the bounding box of the object, used for collision detection.
+    Rectangle GetBounds();
 }

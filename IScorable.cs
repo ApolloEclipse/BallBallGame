@@ -1,7 +1,8 @@
 ﻿// IScorable.cs
-// Interface for objects that add score when collected.
+// Defines an interface for objects that provide score when collected.
 
 public interface IScorable
 {
-    int GetScoreValue();  // Returns the score value of the object.
+    // Returns the amount of score awarded when the object is collected.
+    int GetScoreValue();
 }

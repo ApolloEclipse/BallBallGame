@@ -1,11 +1,14 @@
 // IMovable.cs
-// Defines the interface for all moving objects in the game.
+// Defines an interface for all objects that move in the game.
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 public interface IMovable
 {
-    void Update(GameTime gameTime);  // Updates the object's position.
-    void Draw(SpriteBatch spriteBatch); // Renders the object on the screen.
+    // Updates the object's position and movement logic.
+    void Update(GameTime gameTime);
+
+    // Renders the object on the screen.
+    void Draw(SpriteBatch spriteBatch);
 }

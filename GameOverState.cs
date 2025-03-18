@@ -1,5 +1,6 @@
 ﻿// GameOverState.cs
-// Manages the Game Over screen, allowing the player to enter a name, save the score, and navigate to different states.
+// Manages the Game Over screen, allowing the player to enter their name, save their score,
+// and navigate to different game states.
 
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -9,12 +10,12 @@ using Microsoft.Xna.Framework.Input;
 
 public class GameOverState : GameState
 {
-    private Texture2D _backgroundTexture;
-    private SpriteFont _font;
-    private int _finalScore;
-    private string _playerName;
-    private FileManager _fileManager;
-    private string _filePath = "scores.json";
+    private Texture2D _backgroundTexture; // Background image for the Game Over screen
+    private SpriteFont _font; // Font for displaying text
+    private int _finalScore; // Stores the player's final score
+    private string _playerName; // Stores the player's entered name
+    private FileManager _fileManager; // Handles score saving/loading
+    private string _filePath = "scores.json"; // File path for saving scores
 
     private Texture2D _restartButtonTexture;
     private Texture2D _menuButtonTexture;
@@ -28,9 +29,10 @@ public class GameOverState : GameState
     private Rectangle _menuButtonBounds;
     private Rectangle _leaderboardButtonBounds;
 
-    private bool _isEnteringName;
-    private KeyboardState _previousKeyboardState;
+    private bool _isEnteringName; // True if the player is entering their name
+    private KeyboardState _previousKeyboardState; // Stores previous keyboard state to prevent duplicate input
 
+    // Constructor initializes the game over state with the final player score
     public GameOverState(GameStateManager stateManager, GraphicsDevice graphicsDevice, ContentManager content, int finalScore)
         : base(stateManager, graphicsDevice, content)
     {
@@ -39,6 +41,7 @@ public class GameOverState : GameState
         _isEnteringName = true;
     }
 
+    // Loads assets and initializes button positions when entering the game over state
     public override void Enter()
     {
         _backgroundTexture = _content.Load<Texture2D>("UI/Images/GameOverBG");
@@ -60,6 +63,7 @@ public class GameOverState : GameState
         _previousKeyboardState = Keyboard.GetState();
     }
 
+    // Updates player input for name entry and handles button clicks for navigation
     public override void Update(GameTime gameTime)
     {
         KeyboardState keyboardState = Keyboard.GetState();
@@ -90,6 +94,7 @@ public class GameOverState : GameState
         }
         else
         {
+            // Handle button clicks for restarting, returning to the menu, or viewing the leaderboard
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
                 if (_restartButtonBounds.Contains(mouseState.Position))
@@ -108,13 +113,16 @@ public class GameOverState : GameState
         }
     }
 
+    // Saves the player's name and score to the leaderboard file
     private void SaveScore()
     {
         List<ScoreEntry> scores = _fileManager.LoadScores();
         scores.Add(new ScoreEntry(_playerName, _finalScore));
 
+        // Sort scores in descending order
         scores.Sort((a, b) => b.Score.CompareTo(a.Score));
 
+        // Keep only the top 10 scores
         if (scores.Count > 10)
         {
             scores.RemoveAt(10);
@@ -123,10 +131,12 @@ public class GameOverState : GameState
         _fileManager.SaveScores(scores);
     }
 
+    // Draws the game over screen, including score, name entry, and buttons
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         spriteBatch.Draw(_backgroundTexture, new Rectangle(0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height), Color.White);
 
+        // Display the final score
         string scoreText = "FINAL SCORE: " + _finalScore;
         Vector2 scoreSize = _font.MeasureString(scoreText);
         Vector2 scorePosition = new Vector2((_graphicsDevice.Viewport.Width - scoreSize.X) / 2, 100);
@@ -134,6 +144,7 @@ public class GameOverState : GameState
 
         if (_isEnteringName)
         {
+            // Display name entry prompt
             string namePrompt = "ENTER NAME: " + _playerName;
             Vector2 nameSize = _font.MeasureString(namePrompt);
             Vector2 namePosition = new Vector2((_graphicsDevice.Viewport.Width - nameSize.X) / 2, 200);
@@ -141,6 +152,7 @@ public class GameOverState : GameState
         }
         else
         {
+            // Draw buttons for Restart, Main Menu, and Leaderboard navigation
             spriteBatch.Draw(_restartButtonTexture, _restartButtonBounds, Color.White);
             spriteBatch.Draw(_menuButtonTexture, _menuButtonBounds, Color.White);
             spriteBatch.Draw(_leaderboardButtonTexture, _leaderboardButtonBounds, Color.White);
@@ -151,6 +163,7 @@ public class GameOverState : GameState
         }
     }
 
+    // Draws text on buttons by centering it within the button area
     private void DrawButtonText(SpriteBatch spriteBatch, string text, Vector2 buttonPosition)
     {
         Vector2 textSize = _font.MeasureString(text);
