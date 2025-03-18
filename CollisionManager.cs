@@ -1,5 +1,5 @@
 ﻿// CollisionManager.cs
-// Handles collision detection between the player and objects.
+// Handles collision detection and event triggering.
 
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -8,16 +8,16 @@ public class CollisionManager
 {
     private Player _player;
     private ScoreManager _scoreManager;
-    private UIManager _uiManager; // ✅ UIManager to update life
-    private PlayingState _playingState; // ✅ Reference to PlayingState to reduce life
+    private UIManager _uiManager;
+    private PlayingState _playingState;
     private List<IMovable> _gameObjects;
 
     public CollisionManager(Player player, ScoreManager scoreManager, UIManager uiManager, PlayingState playingState, List<IMovable> gameObjects)
     {
         _player = player;
         _scoreManager = scoreManager;
-        _uiManager = uiManager; // ✅ Store UIManager reference
-        _playingState = playingState; // ✅ Store PlayingState reference
+        _uiManager = uiManager;
+        _playingState = playingState;
         _gameObjects = gameObjects;
     }
 
@@ -33,17 +33,23 @@ public class CollisionManager
                 {
                     if (_gameObjects[i] is IScorable scorable)
                     {
-                        _scoreManager.AddScore(scorable.GetScoreValue()); // ✅ Add score on Ball hit
+                        _scoreManager.IncreaseScore(scorable.GetScoreValue()); // ✅ Add score for Balls
                     }
                     else if (_gameObjects[i] is Debuff)
                     {
-                        _uiManager.DecreaseLife(); // ✅ Reduce life on UI
-                        _playingState.ReduceLife(); // ✅ Reduce life inside PlayingState
+                        System.Diagnostics.Debug.WriteLine("Collision with Debuff Detected!");
+
+                        if (_player != null) // ✅ Ensure the player exists
+                        {
+                            EventManager.Instance.TriggerLifeLost(); // ✅ Call the life lost event
+                        }
                     }
 
-                    _gameObjects.RemoveAt(i);
+                    _gameObjects.RemoveAt(i); // ✅ Remove the object only once
+                    break; // ✅ Ensure only one object is processed per frame
                 }
             }
         }
     }
+
 }

@@ -6,9 +6,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-// Ensure we use the correct SpriteBatch from MonoGame
-using SpriteBatch = Microsoft.Xna.Framework.Graphics.SpriteBatch;
-
 public class PlayingState : GameState
 {
     private Texture2D _backgroundTexture;
@@ -27,7 +24,7 @@ public class PlayingState : GameState
 
     private double _countdown = 3.0;
     private bool _gameStarted = false;
-    private int _lives = 3; // ✅ Added local life counter since ScoreManager doesn't track lives.
+    private int _lives = 3; // ✅ Life counter for game over logic.
 
     private double _elapsedTime = 0; // ✅ Timer to track elapsed time.
 
@@ -36,6 +33,9 @@ public class PlayingState : GameState
 
     public override void Enter()
     {
+        _lives = 3; // ✅ Reset lives when entering PlayingState
+        _elapsedTime = 0; // ✅ Reset timer
+
         // Load assets
         _backgroundTexture = _content.Load<Texture2D>("UI/Images/BackgroundGame");
         _playerTexture = _content.Load<Texture2D>("Textures/player_ball");
@@ -61,8 +61,27 @@ public class PlayingState : GameState
 
         // Initialize scoring, UI, and collision management
         _scoreManager = new ScoreManager();
+
+        // ✅ Ensure UIManager is properly reset
+        _uiManager?.Unsubscribe();
         _uiManager = new UIManager(_countdownFont, _scoreManager);
-        _collisionManager = new CollisionManager(_player, _scoreManager, _uiManager, this, _spawner.GetGameObjects()); // ✅ Pass `this` to CollisionManager
+
+        _collisionManager = new CollisionManager(_player, _scoreManager, _uiManager, this, _spawner.GetGameObjects());
+
+        // ✅ Prevent duplicate event subscriptions
+        EventManager.Instance.OnLifeLost -= ReduceLife;
+        EventManager.Instance.OnLifeLost += ReduceLife;
+    }
+
+    public override void Exit()
+    {
+        System.Diagnostics.Debug.WriteLine("Exiting PlayingState: Unsubscribing from events.");
+
+        // ✅ Ensure event is fully removed before switching state
+        EventManager.Instance.OnLifeLost -= ReduceLife;
+
+        // ✅ Also clear the UIManager events before exiting
+        _uiManager?.Unsubscribe();
     }
 
     public override void Update(GameTime gameTime)
@@ -73,40 +92,42 @@ public class PlayingState : GameState
             if (_countdown <= 0)
             {
                 _gameStarted = true;
-                _countdown = 0; // ✅ Ensure countdown is set to 0 to avoid negative values.
+                _countdown = 0;
             }
         }
         else
         {
-            _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds; // ✅ Update the timer.
+            _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
 
             _player.Update(gameTime);
             _spawner.Update(gameTime);
             _collisionManager.Update();
 
-            // ✅ Instead of using ScoreManager.Lives, we use a local variable.
             if (_lives <= 0)
             {
                 System.Diagnostics.Debug.WriteLine("LIVES == 0: TRANSITIONING TO GAME OVER");
-                _stateManager.SetState(new GameOverState(_stateManager, _graphicsDevice, _content, _scoreManager.GetScore())); // ✅ Using existing ScoreManager method
+                _stateManager.SetState(new GameOverState(_stateManager, _graphicsDevice, _content, _scoreManager.GetScore()));
             }
         }
     }
 
     public void ReduceLife()
     {
+        System.Diagnostics.Debug.WriteLine($"ReduceLife() called. Current Lives: {_lives}");
+
         if (_lives > 0)
         {
             _lives--;
-            System.Diagnostics.Debug.WriteLine("Life lost! Remaining lives: " + _lives);
+            System.Diagnostics.Debug.WriteLine($"Life lost! Remaining lives: {_lives}");
         }
 
-        if (_lives == 0)
+        if (_lives <= 0) // Ensure it only transitions once
         {
             System.Diagnostics.Debug.WriteLine("Lives == 0: Switching to GameOverState!");
             _stateManager.SetState(new GameOverState(_stateManager, _graphicsDevice, _content, _scoreManager.GetScore()));
         }
     }
+
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
@@ -129,11 +150,11 @@ public class PlayingState : GameState
             _spawner.Draw(spriteBatch);
             _uiManager.Draw(spriteBatch, _graphicsDevice);
 
-            // Adjust the timer's position inside the red UI box
+            // ✅ Draw the Timer inside the red UI box
             string timerText = FormatTime(_elapsedTime);
             Vector2 timerSize = _countdownFont.MeasureString(timerText);
 
-            // Define the red box position (use the actual values from your UI layout)
+            // Define the red box position (based on UI layout)
             Vector2 redBoxPosition = new Vector2(80, 40); // Adjust based on your UI
             Vector2 timerPosition = new Vector2(
                 redBoxPosition.X + (200 - timerSize.X) / 2, // Centered inside the box width
@@ -144,7 +165,6 @@ public class PlayingState : GameState
         }
     }
 
-    // ✅ Formats the elapsed time in xx:xx:xx format (Minutes:Seconds:Milliseconds)
     private string FormatTime(double timeInSeconds)
     {
         int minutes = (int)(timeInSeconds / 60);

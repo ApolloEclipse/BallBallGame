@@ -1,5 +1,5 @@
 // ScoreManager.cs
-// Manages the player's score.
+// Handles score tracking and emits events for UI updates.
 
 public class ScoreManager
 {
@@ -10,9 +10,10 @@ public class ScoreManager
         _score = 0;
     }
 
-    public void AddScore(int value)
+    public void IncreaseScore(int amount)
     {
-        _score += value;
+        _score += amount;
+        EventManager.Instance.TriggerScoreUpdate(_score);
     }
 
     public int GetScore()
