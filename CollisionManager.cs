@@ -9,13 +9,15 @@ public class CollisionManager
     private Player _player;
     private ScoreManager _scoreManager;
     private UIManager _uiManager; // ✅ UIManager to update life
+    private PlayingState _playingState; // ✅ Reference to PlayingState to reduce life
     private List<IMovable> _gameObjects;
 
-    public CollisionManager(Player player, ScoreManager scoreManager, UIManager uiManager, List<IMovable> gameObjects)
+    public CollisionManager(Player player, ScoreManager scoreManager, UIManager uiManager, PlayingState playingState, List<IMovable> gameObjects)
     {
         _player = player;
         _scoreManager = scoreManager;
         _uiManager = uiManager; // ✅ Store UIManager reference
+        _playingState = playingState; // ✅ Store PlayingState reference
         _gameObjects = gameObjects;
     }
 
@@ -35,7 +37,8 @@ public class CollisionManager
                     }
                     else if (_gameObjects[i] is Debuff)
                     {
-                        _uiManager.DecreaseLife(); // ✅ Reduce life on Debuff hit
+                        _uiManager.DecreaseLife(); // ✅ Reduce life on UI
+                        _playingState.ReduceLife(); // ✅ Reduce life inside PlayingState
                     }
 
                     _gameObjects.RemoveAt(i);
