@@ -1,33 +1,39 @@
 ﻿// PlayingState.cs
-// Manages the main gameplay state, including player movement, object spawning, and difficulty scaling.
+// Manages the gameplay state, including player movement, spawning objects, and collision handling.
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
+// Ensure we use the correct SpriteBatch from MonoGame
+using SpriteBatch = Microsoft.Xna.Framework.Graphics.SpriteBatch;
+
 public class PlayingState : GameState
 {
-    private Texture2D _backgroundTexture;  // Background image
-    private Texture2D _playerTexture;      // Player image
-    private Texture2D _ballTexture;        // Ball image
-    private Texture2D _debuffTexture;      // Debuff image
+    // ✅ Class-level variable declarations (Fix for missing variables)
+    private Texture2D _backgroundTexture;
+    private Texture2D _playerTexture;
+    private Texture2D _ballTexture;
+    private Texture2D _debuffTexture;
 
-    private Vector2 _playerStartPosition;  // Initial player position
-    private Player _player;                // Player object
-    private SpriteFont _countdownFont;     // Font for countdown timer
+    private Vector2 _playerStartPosition;
+    private Player _player;
+    private SpriteFont _countdownFont;
 
-    private ObjectSpawner _spawner;        // Spawns Balls & Debuffs
-    private LevelManager _levelManager;    // Handles difficulty scaling
+    private ObjectSpawner _spawner;
+    private ScoreManager _scoreManager;
+    private UIManager _uiManager;
+    private CollisionManager _collisionManager;
 
-    private double _countdown = 3.0;       // Countdown timer in seconds
-    private bool _gameStarted = false;     // Indicates if the game has started
+    private double _countdown = 3.0;
+    private bool _gameStarted = false;
 
+    // ✅ Corrected Constructor with Proper Inheritance
     public PlayingState(GameStateManager stateManager, GraphicsDevice graphicsDevice, ContentManager content)
-        : base(stateManager, graphicsDevice, content)
-    {
-    }
+        : base(stateManager, graphicsDevice, content) { }
 
+    // ✅ Overrides base Enter() correctly
     public override void Enter()
     {
         // Load assets
@@ -39,24 +45,27 @@ public class PlayingState : GameState
 
         // Set player start position
         _playerStartPosition = new Vector2(
-            _graphicsDevice.Viewport.Width * 0.1f, // 10% from the left
-            _graphicsDevice.Viewport.Height * 0.8f // 80% from the top
+            _graphicsDevice.Viewport.Width * 0.1f,
+            _graphicsDevice.Viewport.Height * 0.8f
         );
 
         // Define player movement boundaries
-        int minY = (int)(_graphicsDevice.Viewport.Height * 0.45f); // 45% from the top
-        int maxY = (int)(_graphicsDevice.Viewport.Height * 0.8f); // 80% from the top
+        int minY = (int)(_graphicsDevice.Viewport.Height * 0.45f);
+        int maxY = (int)(_graphicsDevice.Viewport.Height * 0.8f);
 
         // Initialize player
         _player = new Player(_playerTexture, _playerStartPosition, minY, maxY);
 
-        // Initialize object spawner with movement boundaries
+        // ✅ Initialize object spawner with movement boundaries
         _spawner = new ObjectSpawner(_ballTexture, _debuffTexture, _graphicsDevice.Viewport.Width, minY, maxY);
 
-        // Initialize level manager
-        _levelManager = new LevelManager();
+        // ✅ Initialize scoring, UI, and collision management
+        _scoreManager = new ScoreManager();
+        _uiManager = new UIManager(_countdownFont, _scoreManager);
+        _collisionManager = new CollisionManager(_player, _scoreManager, _uiManager, _spawner.GetGameObjects());
     }
 
+    // ✅ Overrides base Update() correctly
     public override void Update(GameTime gameTime)
     {
         if (!_gameStarted)
@@ -76,11 +85,12 @@ public class PlayingState : GameState
             // Update object spawning
             _spawner.Update(gameTime);
 
-            // Increase difficulty over time
-            _levelManager.Update(gameTime);
+            // Update collision detection
+            _collisionManager.Update();
         }
     }
 
+    // ✅ Overrides base Draw() correctly
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         // Draw background
@@ -106,6 +116,9 @@ public class PlayingState : GameState
 
             // Draw spawned balls and debuffs
             _spawner.Draw(spriteBatch);
+
+            // ✅ Draw UI (Score & Life Counter)
+            _uiManager.Draw(spriteBatch, _graphicsDevice);
         }
     }
 }

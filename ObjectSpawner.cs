@@ -1,4 +1,4 @@
-// ObjectSpawner.cs
+﻿// ObjectSpawner.cs
 // Handles the automatic spawning of Balls and Debuffs.
 
 using Microsoft.Xna.Framework;
@@ -66,5 +66,11 @@ public class ObjectSpawner
         {
             obj.Draw(spriteBatch);
         }
+    }
+
+    // ✅ New Method: Allows CollisionManager to access game objects
+    public List<IMovable> GetGameObjects()
+    {
+        return _gameObjects;
     }
 }

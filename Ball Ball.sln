@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Ball.cs = Ball.cs
 		Border.cs = Border.cs
 		BorderManager.cs = BorderManager.cs
+		CollisionManager.cs = CollisionManager.cs
 		Debuff.cs = Debuff.cs
 		GameManager.cs = GameManager.cs
 		GameState.cs = GameState.cs
@@ -21,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ObjectSpawner.cs = ObjectSpawner.cs
 		Player.cs = Player.cs
 		PlayingState.cs = PlayingState.cs
+		ScoreManager.cs = ScoreManager.cs
+		UIManager.cs = UIManager.cs
 	EndProjectSection
 EndProject
 Global

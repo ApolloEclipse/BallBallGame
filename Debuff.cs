@@ -5,13 +5,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-public class Debuff : IMovable
+public class Debuff : IMovable, ICollidable
 {
-    private Texture2D _texture;  // Debuff texture
-    private Vector2 _position;   // Debuff's position
-    private float _speed;        // Movement speed
-    private int _screenWidth;    // Game screen width
-    private int _minY, _maxY;    // Movement boundaries
+    private Texture2D _texture;
+    private Vector2 _position;
+    private float _speed;
+    private int _screenWidth;
+    private int _minY, _maxY;
 
     public Debuff(Texture2D texture, int screenWidth, int minY, int maxY)
     {
@@ -20,7 +20,7 @@ public class Debuff : IMovable
         _minY = minY;
         _maxY = maxY;
         ResetPosition();
-        _speed = 3f; // Fixed speed
+        _speed = 3f;
     }
 
     public void Update(GameTime gameTime)
@@ -42,6 +42,11 @@ public class Debuff : IMovable
     private void ResetPosition()
     {
         Random random = new Random();
-        _position = new Vector2(_screenWidth, random.Next(_minY, _maxY)); // Spawn within player's movement range
+        _position = new Vector2(_screenWidth, random.Next(_minY, _maxY));
+    }
+
+    public Rectangle GetBounds()
+    {
+        return new Rectangle((int)_position.X, (int)_position.Y, 100, 100); // Correct Debuff size
     }
 }

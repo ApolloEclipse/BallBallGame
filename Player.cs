@@ -1,18 +1,21 @@
-﻿using Microsoft.Xna.Framework;
+﻿// Player.cs
+// Handles player movement and collision detection.
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-public class Player
+public class Player : ICollidable
 {
-    private Texture2D _texture; // Player texture
-    private Vector2 _position; // Player position
-    private float _speed = 3f; // Player movement speed
-    private bool _movingUp = true; // Controls movement direction
+    private Texture2D _texture;
+    private Vector2 _position;
+    private float _speed = 3f;
+    private bool _movingUp = true;
 
-    private int minBoundaryY; // Minimum Y boundary
-    private int maxBoundaryY; // Maximum Y boundary
+    private int minBoundaryY;
+    private int maxBoundaryY;
 
-    private KeyboardState _previousState; // Tracks previous key state
+    private KeyboardState _previousState;
 
     public Player(Texture2D texture, Vector2 startPosition, int minY, int maxY)
     {
@@ -26,23 +29,25 @@ public class Player
     {
         KeyboardState currentState = Keyboard.GetState();
 
-        // Toggle direction only on the first key press (prevents multiple flips)
         if (currentState.IsKeyDown(Keys.Space) && _previousState.IsKeyUp(Keys.Space))
         {
             _movingUp = !_movingUp;
         }
 
-        // Move player based on direction
         _position.Y += _movingUp ? -_speed : _speed;
 
-        // Keep player within boundaries
         _position.Y = MathHelper.Clamp(_position.Y, minBoundaryY, maxBoundaryY);
 
-        _previousState = currentState; // Store the current state for the next frame
+        _previousState = currentState;
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Draw(_texture, _position, Color.White);
+    }
+
+    public Rectangle GetBounds()
+    {
+        return new Rectangle((int)_position.X - 5, (int)_position.Y + 10, 70, 70); // Player collider size
     }
 }
